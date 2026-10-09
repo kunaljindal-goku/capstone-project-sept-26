@@ -7,6 +7,7 @@ import dev.kunal.productcatalogservice.model.Product;
 import dev.kunal.productcatalogservice.service.DummyProductService;
 import dev.kunal.productcatalogservice.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +34,16 @@ public class ProductController {
 
     @GetMapping("/{id}")
     ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long id) {
+        if (id < 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         Product product = productService.getProductById(id);
-        return new ResponseEntity<>(from(product),HttpStatus.OK);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        }
+        return new ResponseEntity<>(from(product), HttpStatus.OK);
     }
 
     private ProductDto from(Product product) {

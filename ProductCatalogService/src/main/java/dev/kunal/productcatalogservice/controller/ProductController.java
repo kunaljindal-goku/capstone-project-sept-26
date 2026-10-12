@@ -2,13 +2,16 @@ package dev.kunal.productcatalogservice.controller;
 
 import dev.kunal.productcatalogservice.dto.CategoryDto;
 import dev.kunal.productcatalogservice.dto.ProductDto;
+import dev.kunal.productcatalogservice.dto.ProductPitchDto;
 import dev.kunal.productcatalogservice.model.Category;
 import dev.kunal.productcatalogservice.model.Product;
 import dev.kunal.productcatalogservice.service.DummyProductService;
 import dev.kunal.productcatalogservice.service.IProductService;
+import dev.kunal.productcatalogservice.service.PitchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +25,12 @@ import java.util.List;
 public class ProductController {
 
     private IProductService productService;
+    private PitchService pitchService;
 
-    public ProductController(IProductService productService) {
+    public ProductController(IProductService productService,
+                             PitchService pitchService) {
         this.productService = productService;
+        this.pitchService = pitchService;
     }
 
     @GetMapping
@@ -35,6 +41,7 @@ public class ProductController {
     @GetMapping("/{id}")
     ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long id) {
         if (id < 0) {
+            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -47,18 +54,39 @@ public class ProductController {
     }
 
     private ProductDto from(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setName(product.getName());
-        productDto.setDescription(product.getDescription());
-        productDto.setPrice(product.getPrice());
+        ProductDto dto = new ProductDto();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        dto.setImageUrl(product.getImageUrl());
 
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setDescription(product.getCategory().getDescription());
-        categoryDto.setId(product.getCategory().getId());
-        categoryDto.setName(product.getCategory().getName());
+        if (product.getCategory() != null) {
+            CategoryDto categoryDto = new CategoryDto();
+            categoryDto.setId(product.getCategory().getId());
+            categoryDto.setName(product.getCategory().getName());
+            categoryDto.setDescription(product.getCategory().getDescription());
+            dto.setCategory(categoryDto);
+        }
+        return dto;
+    }
 
-        productDto.setCategory(categoryDto);
-        return productDto;
+    @GetMapping("/{id}/pitch")
+    public ResponseEntity<ProductPitchDto> generatePitch(@PathVariable Long id) {
+        if(id<0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Product product = productService.getProductById(id);
+        if(product==null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        ProductPitchDto productPitchDto = new ProductPitchDto();
+        productPitchDto.setId(product.getId());
+        productPitchDto.setPitch(pitchService.generatePitch(product));
+        return new ResponseEntity<>(productPitchDto,HttpStatus.OK);
+
     }
 
 }

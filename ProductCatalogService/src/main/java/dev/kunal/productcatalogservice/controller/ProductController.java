@@ -9,6 +9,7 @@ import dev.kunal.productcatalogservice.service.DummyProductService;
 import dev.kunal.productcatalogservice.service.IProductService;
 import dev.kunal.productcatalogservice.service.PitchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,13 +25,16 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
-    private IProductService productService;
-    private PitchService pitchService;
+    private final IProductService productService;
+    private final PitchService pitchService;
+    private final IProductService supplierService;
 
     public ProductController(IProductService productService,
-                             PitchService pitchService) {
+                             PitchService pitchService,
+                             @Qualifier("dummyProductService") IProductService supplierService) {
         this.productService = productService;
         this.pitchService = pitchService;
+        this.supplierService = supplierService;
     }
 
     @GetMapping
@@ -46,6 +50,9 @@ public class ProductController {
         }
 
         Product product = productService.getProductById(id);
+//        Product product = supplierService
+//                .getProductById(id);
+
         if (product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 

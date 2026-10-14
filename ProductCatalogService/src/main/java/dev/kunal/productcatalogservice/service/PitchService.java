@@ -2,6 +2,7 @@ package dev.kunal.productcatalogservice.service;
 
 import dev.kunal.productcatalogservice.dto.GroqPitchResponseDto;
 import dev.kunal.productcatalogservice.model.Product;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class PitchService {
 
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -50,7 +52,8 @@ public class PitchService {
             throw new IllegalArgumentException("Pitch couldnt be geenrated");
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
+            log.warn("Error in LLM call" + e.getMessage());
             return "New arrival: " + product.getName() +
                     " for just $" + product.getPrice() + ". Check it out!";
         }

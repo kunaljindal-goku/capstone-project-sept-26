@@ -1,11 +1,16 @@
 package dev.kunal.productcatalogservice.service;
 
+import dev.kunal.productcatalogservice.dto.ProductDto;
+import dev.kunal.productcatalogservice.model.Category;
 import dev.kunal.productcatalogservice.model.Product;
+import dev.kunal.productcatalogservice.model.enums.State;
+import dev.kunal.productcatalogservice.repository.CategoryRepository;
 import dev.kunal.productcatalogservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +20,11 @@ import java.util.Optional;
 public class StorageProductService implements IProductService{
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepo;
 
-    public StorageProductService(ProductRepository productRepository) {
+    public StorageProductService(ProductRepository productRepository, CategoryRepository categoryRepo) {
         this.productRepository = productRepository;
+        this.categoryRepo = categoryRepo;
     }
 
 
@@ -30,7 +37,61 @@ public class StorageProductService implements IProductService{
 //        }
 //        return productOptional.get();
         log.info("Reading product from DB: "+id);
-        return productRepository.findById(id).orElse(null);
+        return productRepository.findByIdAndState(id,State.ACTIVE).orElse(null);
+    }
+
+    @Override
+    public Product createProduct(ProductDto productDto) {
+        Product product = from(productDto);
+        product.setCategory(findOrCreateCategory(product.getCategory()));
+        product.setCreatedAt(new Date());
+        product.setLastUpdatedAt(new Date());
+        product.setState(State.ACTIVE);
+        return productRepository.save(product);
+    }
+
+    @Override
+    public boolean deleteProductById(Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if(product==null) return false;
+        product.setState(State.INACTIVE);
+        product.setLastUpdatedAt(new Date());
+        productRepository.save(product);
+        return true;
+    }
+
+    private Category findOrCreateCategory(Category category) {
+        if (category == null) {
+            return null;
+        }
+
+        Optional<Category> existing = categoryRepo.findByName(category.getName());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        Date now = new Date();
+        category.setId(null);
+        category.setCreatedAt(now);
+        category.setLastUpdatedAt(now);
+        return category;
+    }
+
+    private Product from(ProductDto dto) {
+        Product product = new Product();
+        product.setId(dto.getId());
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setImageUrl(dto.getImageUrl());
+
+        if (dto.getCategory() != null) {
+            Category category = new Category();
+            category.setName(dto.getCategory().getName());
+            category.setDescription(dto.getCategory().getDescription());
+            product.setCategory(category);
+        }
+        return product;
     }
 
     public List<Product> getAllProducts() {

@@ -1,6 +1,7 @@
 package dev.kunal.productcatalogservice.service;
 
 import dev.kunal.productcatalogservice.dto.DummyJsonProductDto;
+import dev.kunal.productcatalogservice.dto.ProductDto;
 import dev.kunal.productcatalogservice.model.Category;
 import dev.kunal.productcatalogservice.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,16 @@ public class DummyProductService implements IProductService {
         } catch (HttpClientErrorException.NotFound e) {
             return null;
         }
+    }
+
+    @Override
+    public Product createProduct(ProductDto productDto) {
+        return null;
+    }
+
+    @Override
+    public boolean deleteProductById(Long id) {
+        return false;
     }
 
     private Product from(DummyJsonProductDto dto) {

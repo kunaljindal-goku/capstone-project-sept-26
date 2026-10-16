@@ -8,8 +8,11 @@ import dev.kunal.productcatalogservice.repository.CategoryRepository;
 import dev.kunal.productcatalogservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,12 +33,6 @@ public class StorageProductService implements IProductService{
 
     @Override
     public Product getProductById(Long id) {
-//        Optional<Product> productOptional =
-//                productRepository.findById(id);
-//        if(productOptional.isEmpty()) {
-//            return null;
-//        }
-//        return productOptional.get();
         log.info("Reading product from DB: "+id);
         return productRepository.findByIdAndState(id,State.ACTIVE).orElse(null);
     }
@@ -89,12 +86,21 @@ public class StorageProductService implements IProductService{
             Category category = new Category();
             category.setName(dto.getCategory().getName());
             category.setDescription(dto.getCategory().getDescription());
+            category.setState(State.ACTIVE);
             product.setCategory(category);
         }
         return product;
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllProducts();
+    }
+
+    @Override
+    public Page<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+        return productRepository.findByPriceBetweenAndState(minPrice,
+                maxPrice,
+                State.ACTIVE,
+                pageable);
     }
 }

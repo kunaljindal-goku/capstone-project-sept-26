@@ -1,15 +1,22 @@
 package dev.kunal.productcatalogservice.service;
 
 import dev.kunal.productcatalogservice.dto.DummyJsonProductDto;
+import dev.kunal.productcatalogservice.dto.DummyJsonProductListDto;
 import dev.kunal.productcatalogservice.dto.ProductDto;
 import dev.kunal.productcatalogservice.model.Category;
 import dev.kunal.productcatalogservice.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DummyProductService implements IProductService {
@@ -43,6 +50,23 @@ public class DummyProductService implements IProductService {
     @Override
     public boolean deleteProductById(Long id) {
         return false;
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        ResponseEntity<DummyJsonProductListDto> response = restTemplate.getForEntity(
+                "https://dummyjson.com/products?limit=0", DummyJsonProductListDto.class);
+
+        List<Product> products = new ArrayList<>();
+        for (DummyJsonProductDto dto : response.getBody().getProducts()) {
+            products.add(from(dto));
+        }
+        return products;
+    }
+
+    @Override
+    public Page<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+        return null;
     }
 
     private Product from(DummyJsonProductDto dto) {

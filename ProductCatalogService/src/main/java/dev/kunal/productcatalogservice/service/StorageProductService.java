@@ -1,11 +1,13 @@
 package dev.kunal.productcatalogservice.service;
 
 import dev.kunal.productcatalogservice.dto.ProductDto;
+import dev.kunal.productcatalogservice.mappers.ProductMapper;
 import dev.kunal.productcatalogservice.model.Category;
 import dev.kunal.productcatalogservice.model.Product;
 import dev.kunal.productcatalogservice.model.enums.State;
 import dev.kunal.productcatalogservice.repository.CategoryRepository;
 import dev.kunal.productcatalogservice.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -20,15 +22,20 @@ import java.util.Optional;
 @Service
 @Primary
 @Slf4j
+@RequiredArgsConstructor
 public class StorageProductService implements IProductService{
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepo;
+    private final ProductMapper productMapper;
 
-    public StorageProductService(ProductRepository productRepository, CategoryRepository categoryRepo) {
-        this.productRepository = productRepository;
-        this.categoryRepo = categoryRepo;
-    }
+//    public StorageProductService(ProductRepository productRepository,
+//                                 CategoryRepository categoryRepo,
+//                                 ProductMapper productMapper) {
+//        this.productRepository = productRepository;
+//        this.categoryRepo = categoryRepo;
+//        this.productMapper = productMapper;
+//    }
 
 
     @Override
@@ -39,7 +46,7 @@ public class StorageProductService implements IProductService{
 
     @Override
     public Product createProduct(ProductDto productDto) {
-        Product product = from(productDto);
+        Product product = productMapper.toEntity(productDto);
         product.setCategory(findOrCreateCategory(product.getCategory()));
         product.setCreatedAt(new Date());
         product.setLastUpdatedAt(new Date());
@@ -72,24 +79,6 @@ public class StorageProductService implements IProductService{
         category.setCreatedAt(now);
         category.setLastUpdatedAt(now);
         return category;
-    }
-
-    private Product from(ProductDto dto) {
-        Product product = new Product();
-        product.setId(dto.getId());
-        product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
-        product.setImageUrl(dto.getImageUrl());
-
-        if (dto.getCategory() != null) {
-            Category category = new Category();
-            category.setName(dto.getCategory().getName());
-            category.setDescription(dto.getCategory().getDescription());
-            category.setState(State.ACTIVE);
-            product.setCategory(category);
-        }
-        return product;
     }
 
     public List<Product> getAllProducts() {

@@ -9,10 +9,12 @@ import dev.kunal.userauthservice.service.AuthService;
 import dev.kunal.userauthservice.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +26,7 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signUp(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<UserDto> signUp(@Valid @RequestBody AuthRequest authRequest) {
         User user = authService.signUp(authRequest.getEmail(),
                 authRequest.getPassword());
         if(user == null){

@@ -23,7 +23,6 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication authentication) {
-        System.out.println(authentication.getName());
         Optional<User> optionalUser = userRepo.findByEmail(authentication.getName());
         if (optionalUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

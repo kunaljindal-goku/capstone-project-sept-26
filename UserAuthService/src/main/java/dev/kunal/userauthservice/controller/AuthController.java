@@ -10,11 +10,9 @@ import dev.kunal.userauthservice.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -67,10 +65,5 @@ public class AuthController {
         } catch (JwtException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-    }
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello";
     }
 }

@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
-        if (header != null && !header.startsWith("Bearer ")) {
+        if (header != null && header.startsWith("Bearer ")) {
             try {
                 Claims claims = jwtService.parseToken(header.substring("Bearer ".length()));
                 List<GrantedAuthority> grantedAuthorities = List.of(
@@ -46,9 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
             } catch (JwtException e) {
                 SecurityContextHolder.clearContext();
             }
-            filterChain.doFilter(request, response);
         }
-
-
+        filterChain.doFilter(request, response);
     }
 }

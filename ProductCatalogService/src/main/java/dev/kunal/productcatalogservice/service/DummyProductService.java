@@ -48,6 +48,11 @@ public class DummyProductService implements IProductService {
     }
 
     @Override
+    public Product updateProduct(Long id, ProductDto productDto) {
+        return null;
+    }
+
+    @Override
     public boolean deleteProductById(Long id) {
         return false;
     }

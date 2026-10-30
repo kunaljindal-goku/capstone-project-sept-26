@@ -64,6 +64,27 @@ public class StorageProductService implements IProductService{
         return true;
     }
 
+    @Override
+    public Product updateProduct(Long id, ProductDto productDto) {
+        Product existing = productRepository.findByIdAndState(id, State.ACTIVE).orElse(null);
+        if (existing == null) {
+            return null;
+        }
+
+        productMapper.applyPatch(existing, productDto);
+
+        if (productDto.getCategory() != null && productDto.getCategory().getName() != null) {
+            Category category = new Category();
+            category.setName(productDto.getCategory().getName());
+            category.setDescription(productDto.getCategory().getDescription());
+            category.setState(State.ACTIVE);
+            existing.setCategory(findOrCreateCategory(category));
+        }
+
+        existing.setLastUpdatedAt(new Date());
+        return productRepository.save(existing);
+    }
+
     private Category findOrCreateCategory(Category category) {
         if (category == null) {
             return null;

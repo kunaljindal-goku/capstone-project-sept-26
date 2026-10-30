@@ -87,6 +87,19 @@ public class ProductController {
         return new ResponseEntity<>(productMapper.toDto(product), HttpStatus.CREATED);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable("id") Long id,
+                                                    @RequestBody ProductDto productDto) {
+        if (id < 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Product product = productService.updateProduct(id, productDto);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(productMapper.toDto(product), HttpStatus.OK);
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         boolean isDeleted = productService.deleteProductById(id);

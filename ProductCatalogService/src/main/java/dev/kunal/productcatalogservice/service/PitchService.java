@@ -1,5 +1,6 @@
 package dev.kunal.productcatalogservice.service;
 
+import dev.kunal.productcatalogservice.clients.GroqClient;
 import dev.kunal.productcatalogservice.dto.GroqPitchResponseDto;
 import dev.kunal.productcatalogservice.model.Product;
 import lombok.extern.slf4j.Slf4j;
@@ -16,18 +17,20 @@ import java.util.Map;
 @Slf4j
 public class PitchService {
 
-    private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+    private final String GROQ_URL;
     private static final String MODEL = "openai/gpt-oss-20b";
     private static final String SYSTEM_PROMPT = "You are a marketing copywriter for ShopNest, an online store. \"\n" +
             "            + \"You write short push notifications that make people want to open the app.";
 
-    private final RestTemplate restTemplate;
+    private final GroqClient groqClient;
     private final String apiKey;
 
-    public PitchService(RestTemplateBuilder restTemplateBuilder,
-                        @Value("${groq.api-key}") String apiKey) {
-        this.restTemplate = restTemplateBuilder.build();
+    public PitchService(GroqClient groqClient,
+                        @Value("${groq.api-key}") String apiKey,
+                        @Value("${groq.url}") String groqUrl) {
+        this.groqClient = groqClient;
         this.apiKey = apiKey;
+        this.GROQ_URL = groqUrl;
     }
 
 
@@ -44,12 +47,10 @@ public class PitchService {
                             Map.of("role", "system", "content", SYSTEM_PROMPT),
                             Map.of("role", "user", "content", buildPrompt(product))));
 
-            ResponseEntity<GroqPitchResponseDto> response = restTemplate.postForEntity(GROQ_URL,
-                    new HttpEntity<>(body,headers), GroqPitchResponseDto.class);
-            if(response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-                return response.getBody().getChoices().get(0).getMessage().getContent();
-            }
-            throw new IllegalArgumentException("Pitch couldnt be geenrated");
+            GroqPitchResponseDto response = groqClient.chat(body);
+
+            String pitch = response.getChoices().get(0).getMessage().getContent();
+            return pitch;
         }
         catch (Exception e) {
             //System.out.println(e.getMessage());

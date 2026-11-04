@@ -1,5 +1,6 @@
 package dev.kunal.productcatalogservice.security;
 
+import dev.kunal.productcatalogservice.clients.AuthClient;
 import dev.kunal.productcatalogservice.dto.AuthUserDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,12 +21,12 @@ import java.io.IOException;
 public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final String authServiceUrl;
-    private final RestTemplate restTemplate;
+    private final AuthClient authClient;
 
     public TokenValidationFilter(@Value("${auth.service.url}")String authServiceUrl,
-                                 RestTemplateBuilder restTemplateBuilder) {
+                                 AuthClient authClient) {
         this.authServiceUrl = authServiceUrl;
-        this.restTemplate = restTemplateBuilder.build();
+        this.authClient = authClient;
     }
 
 
@@ -45,18 +46,10 @@ public class TokenValidationFilter extends OncePerRequestFilter {
             return;
         }
 
-        AuthUserDto authUserDto;
+        AuthUserDto user;
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", header);
-            ResponseEntity<AuthUserDto> answer = restTemplate.exchange(
-                    this.authServiceUrl+"/auth/validateToken",
-                    HttpMethod.GET,
-                    new HttpEntity<>(headers),
-                    AuthUserDto.class);
-            authUserDto = answer.getBody();
-        }
-        catch (HttpClientErrorException.Unauthorized e) {
+            user = authClient.validateToken(header);
+        } catch (HttpClientErrorException.Unauthorized e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         } catch (RestClientException e) {
@@ -64,7 +57,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(request.getMethod().equals("DELETE") && !"ADMIN".equals(authUserDto.getRole())) {
+        if(request.getMethod().equals("DELETE") && !"ADMIN".equals(user.getRole())) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
         }

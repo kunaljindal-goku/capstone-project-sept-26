@@ -8,16 +8,17 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IProductService {
 
-    Product getProductById(Long id);
+    Product getProductById(UUID id);
 
     Product createProduct(ProductDto productDto);
 
-    Product updateProduct(Long id, ProductDto productDto);
+    Product updateProduct(UUID id, ProductDto productDto);
 
-    boolean deleteProductById(Long id);
+    boolean deleteProductById(UUID id);
 
     List<Product> getAllProducts();
 

@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DummyProductService implements IProductService {
@@ -28,7 +29,7 @@ public class DummyProductService implements IProductService {
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(UUID id) {
         try {
             ResponseEntity<DummyJsonProductDto> response = restTemplate.getForEntity("https://dummyjson.com/products/{id}",
                     DummyJsonProductDto.class,
@@ -48,12 +49,12 @@ public class DummyProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Long id, ProductDto productDto) {
+    public Product updateProduct(UUID id, ProductDto productDto) {
         return null;
     }
 
     @Override
-    public boolean deleteProductById(Long id) {
+    public boolean deleteProductById(UUID id) {
         return false;
     }
 
@@ -76,7 +77,6 @@ public class DummyProductService implements IProductService {
 
     private Product from(DummyJsonProductDto dto) {
         Product product = new Product();
-        product.setId(dto.getId());
         product.setName(dto.getTitle());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());

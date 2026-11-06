@@ -13,10 +13,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.UUID;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product,Long> {
-    Optional<Product> findByIdAndState(Long id, State state);
+public interface ProductRepository extends JpaRepository<Product,UUID> {
+    Optional<Product> findByIdAndState(UUID id, State state);
 
     @EntityGraph(attributePaths = {"category"})
     Page<Product> findByPriceBetweenAndState(BigDecimal minPrice,

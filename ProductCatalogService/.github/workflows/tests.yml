@@ -1,0 +1,20 @@
+# The tests on every push.
+# It runs the tests that need no database on every push and on every pull request.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4x ter
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Run the tests that need no database (the two tests that need MySQL are skipped)
+        run: mvn -B test -Dtest='!ProductCatalogServiceApplicationTests,!ProductSearchIntegrationTest'

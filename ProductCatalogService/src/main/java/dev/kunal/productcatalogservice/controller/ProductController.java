@@ -26,16 +26,16 @@ public class ProductController {
 
     private final IProductService productService;
     private final PitchService pitchService;
-    private final IProductService supplierService;
+   // private final IProductService supplierService;
     private final ProductMapper productMapper;
 
     public ProductController(IProductService productService,
                              PitchService pitchService,
-                             @Qualifier("dummyProductService") IProductService supplierService,
+                          //   @Qualifier("dummyProductService") IProductService supplierService,
                              ProductMapper productMapper) {
         this.productService = productService;
         this.pitchService = pitchService;
-        this.supplierService = supplierService;
+       // this.supplierService = supplierService;
         this.productMapper = productMapper;
     }
 

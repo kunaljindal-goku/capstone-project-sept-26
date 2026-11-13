@@ -63,6 +63,9 @@ public class StorageProductServiceTests {
         assertThat(captor.getValue().getLastUpdatedAt()).isNotNull();
     }
 
+    // Unit tests
+    // integration tests - E2E don't mock the externals calls
+
     // search product - catch minPrice maxPrice bug
 
 }

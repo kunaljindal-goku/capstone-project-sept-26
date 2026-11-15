@@ -27,4 +27,6 @@ public interface ProductRepository extends JpaRepository<Product,UUID> {
 
     @Query("SELECT p from Product p LEFT JOIN FETCH p.category c")
     List<Product> findAllProducts();
+
+    Page<Product> findAllByState(State state, Pageable pageable);
 }

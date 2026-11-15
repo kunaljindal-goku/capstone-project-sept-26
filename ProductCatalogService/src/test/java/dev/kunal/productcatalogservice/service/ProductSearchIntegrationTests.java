@@ -1,6 +1,7 @@
 package dev.kunal.productcatalogservice.service;
 
 import dev.kunal.productcatalogservice.model.Product;
+import dev.kunal.productcatalogservice.model.enums.State;
 import dev.kunal.productcatalogservice.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class ProductServiceIntegrationTests {
+public class ProductSearchIntegrationTests {
 
     @Autowired
     private StorageProductService service;
@@ -41,6 +42,7 @@ public class ProductServiceIntegrationTests {
         Product product = new Product();
         product.setName(name);
         product.setPrice(new BigDecimal(price));
+        product.setState(State.ACTIVE);
         return product;
     }
 

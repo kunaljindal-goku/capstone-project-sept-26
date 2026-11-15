@@ -109,9 +109,12 @@ public class StorageProductService implements IProductService{
 
     @Override
     public Page<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        return productRepository.findByPriceBetweenAndState(minPrice,
-                maxPrice,
-                State.ACTIVE,
-                pageable);
+        if (minPrice == null && maxPrice == null) {
+            return productRepository.findAllByState(State.ACTIVE, pageable);
+        }
+
+        BigDecimal min = minPrice == null ? BigDecimal.ZERO : minPrice;
+        BigDecimal max = maxPrice == null ? new BigDecimal("1000000") : maxPrice;
+        return productRepository.findByPriceBetweenAndState(min, max, State.ACTIVE, pageable);
     }
 }

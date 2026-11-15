@@ -12,9 +12,8 @@ jobs:
     strategy:
       matrix:
         service:
-          - product-catalog
-          - product-search
-          - product-service
+          - ProductCatalogService
+          - UserAuthService
 
     steps:
       - uses: actions/checkout@v4
